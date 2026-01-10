@@ -22,21 +22,21 @@ public class StaticIdentifiableLevelPos extends StaticLevelPos {
 
     public StaticIdentifiableLevelPos(ServerPlayer player) {
         this(player.getUUID(),
-                player.getLevel().dimension(),
+                player.level().dimension(),
                 new ChunkPos(
                         chunkPosCoord(player.getX()),
-                        chunkPosCoord(player.getZ()))
-        );
+                        chunkPosCoord(player.getZ())));
     }
+
     public StaticIdentifiableLevelPos(UUID uuid, CompoundTag tag) {
         this(uuid,
-                DimensionType.parseLegacy(new Dynamic<>(NbtOps.INSTANCE, tag.get("Dimension")))
+                Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, tag.get("Dimension"))
                         .resultOrPartial(Constants.LOG::error)
                         .orElse(Level.OVERWORLD),
-                new ChunkPos(
-                        chunkPosCoord(tag.getList("Pos", Tag.TAG_DOUBLE).get(0)),
-                        chunkPosCoord(tag.getList("Pos", Tag.TAG_DOUBLE).get(2)))
-        );
+                tag.getList("Pos")
+                        .map(list -> new ChunkPos(chunkPosCoord(list.getDouble(0).orElse(0.0)),
+                                chunkPosCoord(list.getDouble(2).orElse(0.0))))
+                        .orElse(new ChunkPos(0, 0)));
     }
 
     public StaticIdentifiableLevelPos(UUID uuid, ResourceKey<Level> level, ChunkPos pos) {

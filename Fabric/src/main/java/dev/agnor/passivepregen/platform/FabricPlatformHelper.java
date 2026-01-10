@@ -12,7 +12,8 @@ import net.minecraft.server.players.PlayerList;
 import java.io.File;
 import java.util.concurrent.Executor;
 
-public class FabricPlatformHelper implements IPlatformHelper, ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.ServerStopped {
+public class FabricPlatformHelper
+        implements IPlatformHelper, ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.ServerStopped {
 
     MinecraftServer server;
 

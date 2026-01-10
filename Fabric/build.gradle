@@ -1,10 +1,26 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.14.10'
     id 'maven-publish'
     id 'idea'
 }
 
-archivesBaseName = "${mod_name}-fabric-${minecraft_version}"
+base {
+    archivesName = "${mod_name}-fabric-${minecraft_version}"
+}
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -13,6 +29,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":Common")
+    
+    // Voxy integration - compile only, required at runtime
+    modCompileOnly "maven.modrinth:voxy:bs9Tu5uz"
 }
 
 loom {
@@ -51,7 +70,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId project.archivesBaseName
+            artifactId base.archivesName.get()
             version project.version
             from components.java
         }

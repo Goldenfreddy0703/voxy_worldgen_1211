@@ -1,36 +1,33 @@
 {
-    "schemaVersion": 1,
-    "id": "passivepregen",
-    "version": "${version}",
-  
-    "name": "Passive Chunk Pregenerator",
-    "description": "This mod generates chunks passively around players, offline or online, and the worldspawn to generate chunks that will most likely be needed in the near future.",
-    "authors": [
-      "agnor99"
-    ],
-    "contact": {
-      "sources": "https://github.com/agnor99/passive-chunk-pregenerator"
-    },
-    "accessWidener" : "passivepregenerator.accesswidener",
-    "__comment": "for quilt",
-    "access_widener" : "passivepregenerator.accesswidener",
-    "license": "CC0-1.0",
-    "icon": "pregen-logo.png",
-  
-    "environment": "*",
-    "entrypoints": {
-      "main": [
-        "dev.agnor.passivepregen.PassivePregenFabric"
-      ]
-    },
-    "mixins": [
-      "mixins.passivepregen.json"
-    ],
-    "depends": {
-      "fabricloader": ">=0.14",
-      "fabric": "*",
-      "minecraft": "1.19.2",
-      "java": ">=17"
-    }
+  "schemaVersion": 1,
+  "id": "passivepregen",
+  "version": "${version}",
+  "name": "Passive Chunk Pregenerator",
+  "description": "This mod generates chunks passively around players, offline or online, and the worldspawn to generate chunks that will most likely be needed in the near future.",
+  "authors": [
+    "agnor99"
+  ],
+  "contact": {
+    "sources": "https://github.com/agnor99/passive-chunk-pregenerator"
+  },
+  "accessWidener": "passivepregenerator.accesswidener",
+  "__comment": "for quilt",
+  "access_widener": "passivepregenerator.accesswidener",
+  "license": "CC0-1.0",
+  "icon": "pregen-logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.agnor.passivepregen.PassivePregenFabric"
+    ]
+  },
+  "mixins": [
+    "mixins.passivepregen.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16",
+    "fabric": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21"
   }
-  
+}

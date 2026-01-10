@@ -1,36 +1,42 @@
 package dev.agnor.passivepregen.mixin;
 
+import com.mojang.logging.LogUtils;
 import dev.agnor.passivepregen.Constants;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.IOWorker;
+import net.minecraft.world.level.chunk.storage.RegionFileStorage;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import javax.annotation.Nullable;
 import java.util.ConcurrentModificationException;
+import java.util.concurrent.CompletableFuture;
 
 @Mixin(IOWorker.class)
-public class IOWorkerMixin {
+public abstract class IOWorkerMixin {
 
-    @Redirect(method = "storePendingChunk",
-            at = @At(
-                    value = "INVOKE",
-                    target = "net/minecraft/world/level/chunk/storage/IOWorker.runStore(Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/storage/IOWorker$PendingStore;)V"))
-    private void init(IOWorker worker, ChunkPos chunkPos, IOWorker.PendingStore pendingStore) {
+    @Shadow
+    @Final
+    private RegionFileStorage storage;
+
+    @Inject(method = "runStore", at = @At("HEAD"), cancellable = true)
+    private void onRunStore(ChunkPos chunkPos, IOWorker.PendingStore pendingStore, CallbackInfo ci) {
         try {
-            worker.storage.write(chunkPos, pendingStore.data);
+            this.storage.write(chunkPos, pendingStore.data);
             pendingStore.result.complete(null);
         } catch (ConcurrentModificationException e) {
-            Constants.LOG.info("Catched ChunkSaveException likely caused by PassivePregen. Chunk will be saved later");
+            Constants.LOG.info("Caught ChunkSaveException likely caused by PassivePregen. Chunk will be saved later");
             pendingStore.result.completeExceptionally(e);
-        } catch (Exception var4) {
-            worker.LOGGER.error("Failed to store chunk {}", chunkPos, var4);
-            pendingStore.result.completeExceptionally(var4);
+        } catch (Exception exception) {
+            LogUtils.getLogger().error("Failed to store chunk {}", chunkPos, exception);
+            pendingStore.result.completeExceptionally(exception);
         }
+        ci.cancel();
     }
 }

@@ -4,7 +4,9 @@ plugins {
     id 'maven-publish'
 }
 
-archivesBaseName = "${mod_name}-common-${minecraft_version}"
+base {
+    archivesName = "${mod_name}-common-${minecraft_version}"
+}
 
 minecraft {
     version(minecraft_version)
@@ -40,7 +42,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId project.archivesBaseName
+            artifactId base.archivesName.get()
             version project.version
             from components.java
         }

@@ -5,6 +5,7 @@ import dev.agnor.passivepregen.levelpos.ILevelPos;
 import dev.agnor.passivepregen.levelpos.StaticIdentifiableLevelPos;
 import dev.agnor.passivepregen.levelpos.StaticLevelPos;
 import lombok.Getter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -62,27 +63,17 @@ public class CommonClass {
     }
 
     public static void onServerStart(MinecraftServer server) {
-        spawnPoint = new StaticLevelPos(Level.OVERWORLD, server.getWorldData().overworldData().getXSpawn(), server.getWorldData().overworldData().getZSpawn());
-        //if (server instanceof DedicatedServer dedicatedServer) {
-        //    File playerDir = Services.PLATFORM.playerDirectoryFromPlayerList(dedicatedServer.getPlayerList());
-        //    if (playerDir.isDirectory()) {
-        //        for (File playerFile : playerDir.listFiles(file -> file.isFile() && file.getName().endsWith(".dat"))) {
-        //            try {
-        //                CompoundTag read = NbtIo.read(playerFile);
-        //                System.out.println(read);
-        //            } catch (IOException exception) {
-        //                Constants.LOG.warn("playerfile couldn't be read", exception);
-        //            }
-        //        }
-        //    } else {
-        //        Constants.LOG.warn("playerDirectory is not a directory");
-        //    }
-        //}
+        // In very recent 1.21.x official mappings, LevelData has:
+        BlockPos spawnPos = server.overworld().getLevelData().getRespawnData().pos();
+
+        // Then extract x/z as before
+        spawnPoint = new StaticLevelPos(Level.OVERWORLD, spawnPos.getX(), spawnPos.getZ());
     }
 
     public static void onServerStop() {
         spawnPoint = null;
     }
+
     private static PassivePregenWorker worker = null;
 
     public static void onServerTickPost() {

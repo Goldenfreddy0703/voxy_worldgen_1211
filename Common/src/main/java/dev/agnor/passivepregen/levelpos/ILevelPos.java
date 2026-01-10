@@ -8,17 +8,19 @@ import net.minecraft.world.level.ChunkPos;
 
 public interface ILevelPos {
     ChunkPos getPos();
+
     ServerLevel getServerLevel();
 
     static int chunkPosCoord(Tag tag) {
         if (tag instanceof NumericTag numericTag) {
-            return chunkPosCoord(numericTag.getAsDouble());
+            return chunkPosCoord(numericTag.doubleValue());
         }
         Constants.LOG.warn("position tag was not a double value");
         return 0;
     }
+
     static int chunkPosCoord(double coord) {
-        return (int)coord / 16;
+        return (int) coord / 16;
     }
 
     int loadDistance();

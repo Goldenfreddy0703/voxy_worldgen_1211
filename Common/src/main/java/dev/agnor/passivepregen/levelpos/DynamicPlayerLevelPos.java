@@ -11,13 +11,14 @@ import static dev.agnor.passivepregen.levelpos.ILevelPos.*;
 public class DynamicPlayerLevelPos implements ILevelPos {
 
     private ServerPlayer player;
+
     public DynamicPlayerLevelPos(ServerPlayer player) {
         this.player = player;
     }
 
     @Override
     public ServerLevel getServerLevel() {
-        return player.getLevel();
+        return (ServerLevel) player.level();
     }
 
     @Override
