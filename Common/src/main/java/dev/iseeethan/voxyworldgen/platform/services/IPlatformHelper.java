@@ -20,4 +20,15 @@ public interface IPlatformHelper {
     int getPlayerLoadDistance();
 
     int getSpawnLoadDistance();
+    
+    // Config accessors for Common module
+    boolean isChunkGenerationEnabled();
+    
+    boolean shouldPrioritizeNearPlayer();
+    
+    /**
+     * Get the generation style as a string identifier.
+     * Values: "SPIRAL_OUT", "SPIRAL_IN", "CONCENTRIC", "ORIGINAL", "RANDOM"
+     */
+    String getGenerationStyle();
 }

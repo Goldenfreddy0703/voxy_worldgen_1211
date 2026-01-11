@@ -39,12 +39,27 @@ public class FabricPlatformHelper
 
     @Override
     public int getPlayerLoadDistance() {
-        return VoxyWorldGenConfig.player_distance;
+        return VoxyWorldGenConfig.getPlayerDistance();
     }
 
     @Override
     public int getSpawnLoadDistance() {
-        return VoxyWorldGenConfig.spawn_distance;
+        return VoxyWorldGenConfig.getSpawnDistance();
+    }
+    
+    @Override
+    public boolean isChunkGenerationEnabled() {
+        return VoxyWorldGenConfig.isEnabled();
+    }
+    
+    @Override
+    public boolean shouldPrioritizeNearPlayer() {
+        return VoxyWorldGenConfig.shouldPrioritizeNearPlayer();
+    }
+    
+    @Override
+    public String getGenerationStyle() {
+        return VoxyWorldGenConfig.getGenerationStyle().name();
     }
 
     @Override

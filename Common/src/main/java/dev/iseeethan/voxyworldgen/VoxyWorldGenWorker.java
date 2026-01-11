@@ -15,7 +15,11 @@ import java.util.function.Consumer;
 
 public class VoxyWorldGenWorker {
 
-    private Map<ServerLevel, List<ChunkPos>> generated = new HashMap<>();
+    private Map<ServerLevel, Set<ChunkPos>> generated = new HashMap<>();
+    private Map<ILevelPos, List<ChunkPos>> positionQueues = new HashMap<>();
+    private Map<ILevelPos, Integer> queueIndices = new HashMap<>();
+    private Map<ILevelPos, ChunkPos> lastKnownPositions = new HashMap<>();
+    private String lastGenerationStyle = null;
     public AtomicInteger doneGenerating = new AtomicInteger();
 
     // Hook for external chunk processing (e.g., Voxy LOD ingestion)
@@ -26,57 +30,149 @@ public class VoxyWorldGenWorker {
     }
 
     public void doWork() {
+        // Check if generation is enabled
+        if (!Services.PLATFORM.isChunkGenerationEnabled()) {
+            return;
+        }
+        
+        // Check if generation style changed
+        String currentStyle = Services.PLATFORM.getGenerationStyle();
+        if (!currentStyle.equals(lastGenerationStyle)) {
+            clearCache();
+            lastGenerationStyle = currentStyle;
+        }
+        
         var levelPositions = new ArrayList<>(VoxyWorldGenCommon.getPlayerPos());
         levelPositions.add(VoxyWorldGenCommon.getSpawnPoint());
-        Collections.shuffle(levelPositions);
-        for (ILevelPos levelPos : levelPositions) {
-            checkPos(levelPos);
+        
+        if (Services.PLATFORM.shouldPrioritizeNearPlayer()) {
+            // Process player positions first, then spawn
+            for (ILevelPos levelPos : levelPositions) {
+                checkPos(levelPos);
+            }
+        } else {
+            // Random order
+            Collections.shuffle(levelPositions);
+            for (ILevelPos levelPos : levelPositions) {
+                checkPos(levelPos);
+            }
         }
+    }
+
+    /**
+     * Check if the player has moved significantly and needs a new queue.
+     * Returns true if the queue needs to be regenerated.
+     */
+    private boolean hasPositionChanged(ILevelPos levelPos) {
+        ChunkPos currentPos = levelPos.getPos();
+        ChunkPos lastPos = lastKnownPositions.get(levelPos);
+        
+        if (lastPos == null) {
+            return true; // No previous position, needs queue
+        }
+        
+        // Check if moved more than 8 chunks (half a typical radius)
+        int dx = Math.abs(currentPos.x - lastPos.x);
+        int dz = Math.abs(currentPos.z - lastPos.z);
+        
+        return dx > 8 || dz > 8;
+    }
+
+    /**
+     * Get or generate the chunk position queue for a level position based on the current generation style.
+     */
+    private List<ChunkPos> getPositionQueue(ILevelPos levelPos) {
+        // Check if player has moved significantly - regenerate queue if so
+        if (hasPositionChanged(levelPos)) {
+            positionQueues.remove(levelPos);
+            queueIndices.remove(levelPos);
+        }
+        
+        // Check if we need to regenerate the queue
+        if (!positionQueues.containsKey(levelPos)) {
+            ChunkPos center = levelPos.getPos();
+            int radius = levelPos.loadDistance();
+            String style = Services.PLATFORM.getGenerationStyle();
+            
+            List<ChunkPos> queue = switch (style) {
+                case "SPIRAL_OUT" -> ChunkPatternGenerator.generateSpiralOut(center, radius);
+                case "SPIRAL_IN" -> ChunkPatternGenerator.generateSpiralIn(center, radius);
+                case "CONCENTRIC" -> ChunkPatternGenerator.generateConcentric(center, radius);
+                case "ORIGINAL" -> ChunkPatternGenerator.generateOriginal(center, radius);
+                case "RANDOM" -> ChunkPatternGenerator.generateRandom(center, radius);
+                default -> ChunkPatternGenerator.generateSpiralOut(center, radius);
+            };
+            
+            positionQueues.put(levelPos, queue);
+            queueIndices.put(levelPos, 0);
+            lastKnownPositions.put(levelPos, center);
+        }
+        
+        return positionQueues.get(levelPos);
     }
 
     private void checkPos(ILevelPos levelPos) {
-        if (levelPos.isCompleted())
+        if (levelPos == null || levelPos.isCompleted())
             return;
+            
         ServerLevel level = levelPos.getServerLevel();
-        if (Services.PLATFORM.isChunkExecutorWorking(level))
+        if (level == null || Services.PLATFORM.isChunkExecutorWorking(level))
             return;
-        for (int dx = 0; dx < levelPos.loadDistance(); dx++) {
-            for (int dy = 0; dy < levelPos.loadDistance(); dy++) {
-                for (boolean invertX : new boolean[] { true, false }) {
-                    for (boolean invertY : new boolean[] { true, false }) {
-                        if ((dx == 0 && !invertX) || (dy == 0 && !invertY))
-                            continue;
-                        ChunkPos pos = move(levelPos.getPos(), invertX ? -dx : dx, invertY ? -dy : dy);
-                        if (!generated.computeIfAbsent(level, l -> new ArrayList<>()).contains(pos)) {
-                            if (!level.hasChunk(pos.x, pos.z)) {
-                                ChunkAccess chunk = level.getChunk(pos.x, pos.z, ChunkStatus.EMPTY, true);
-                                if (!chunk.getPersistedStatus().isOrAfter(ChunkStatus.FULL)) {
-                                    generated.get(level).add(pos);
-                                    CompletableFuture.supplyAsync(() -> {
-                                        ChunkAccess generatedChunk = level.getChunkSource().getChunk(pos.x, pos.z,
-                                                ChunkStatus.FULL, true);
-                                        // Call the chunk generated callback if set
-                                        if (chunkGeneratedCallback != null) {
-                                            chunkGeneratedCallback.accept(generatedChunk);
-                                        }
-                                        doneGenerating.getAndIncrement();
-                                        return null;
-                                    }, Services.PLATFORM.getChunkGenExecutor(level));
-                                    return;
-                                }
-                            }
-                            generated.get(level).add(pos);
+        
+        List<ChunkPos> queue = getPositionQueue(levelPos);
+        int currentIndex = queueIndices.getOrDefault(levelPos, 0);
+        Set<ChunkPos> levelGenerated = generated.computeIfAbsent(level, l -> new HashSet<>());
+        
+        // Process chunks from the queue
+        while (currentIndex < queue.size()) {
+            ChunkPos pos = queue.get(currentIndex);
+            currentIndex++;
+            queueIndices.put(levelPos, currentIndex);
+            
+            // Skip if already generated
+            if (levelGenerated.contains(pos)) {
+                continue;
+            }
+            
+            // Check if chunk needs generation
+            if (!level.hasChunk(pos.x, pos.z)) {
+                ChunkAccess chunk = level.getChunk(pos.x, pos.z, ChunkStatus.EMPTY, true);
+                if (!chunk.getPersistedStatus().isOrAfter(ChunkStatus.FULL)) {
+                    levelGenerated.add(pos);
+                    CompletableFuture.supplyAsync(() -> {
+                        ChunkAccess generatedChunk = level.getChunkSource().getChunk(pos.x, pos.z,
+                                ChunkStatus.FULL, true);
+                        // Call the chunk generated callback if set
+                        if (chunkGeneratedCallback != null) {
+                            chunkGeneratedCallback.accept(generatedChunk);
                         }
-                    }
+                        doneGenerating.getAndIncrement();
+                        return null;
+                    }, Services.PLATFORM.getChunkGenExecutor(level));
+                    return; // One chunk at a time per level position
                 }
             }
+            levelGenerated.add(pos);
         }
-        if (levelPos instanceof StaticLevelPos staticLevelPos) {
-            staticLevelPos.setCompleted(true);
+        
+        // Queue exhausted - mark as completed (only for static positions like spawn)
+        if (currentIndex >= queue.size()) {
+            if (levelPos instanceof StaticLevelPos staticLevelPos) {
+                staticLevelPos.setCompleted(true);
+            }
+            // For dynamic player positions, clear the queue so it can regenerate
+            // This allows continued generation as the player moves
+            positionQueues.remove(levelPos);
+            queueIndices.remove(levelPos);
         }
     }
 
-    private static ChunkPos move(ChunkPos pos, int x, int z) {
-        return new ChunkPos(pos.x + x, pos.z + z);
+    /**
+     * Clear caches when config changes or world changes.
+     */
+    public void clearCache() {
+        positionQueues.clear();
+        queueIndices.clear();
+        lastKnownPositions.clear();
     }
 }

@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "dev.iseeethan.voxyworldgen.VoxyWorldGenFabric"
+    ],
+    "modmenu": [
+      "dev.iseeethan.voxyworldgen.config.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -30,5 +33,9 @@
     "fabric": "*",
     "minecraft": "~1.21.11",
     "java": ">=21"
+  },
+  "suggests": {
+    "modmenu": "*",
+    "yet_another_config_lib": ">=3.8.0"
   }
 }

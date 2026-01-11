@@ -20,6 +20,16 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    // YACL repository for config GUI
+    maven {
+        name = "Xander Maven"
+        url = "https://maven.isxander.dev/releases"
+    }
+    // TerraformersMC for ModMenu
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
 }
 
 dependencies {
@@ -32,6 +42,12 @@ dependencies {
     
     // Voxy integration - compile only, required at runtime
     modCompileOnly "maven.modrinth:voxy:bs9Tu5uz"
+    
+    // YACL for config GUI (optional at runtime)
+    modImplementation "dev.isxander:yet-another-config-lib:${yacl_version}"
+    
+    // ModMenu integration (optional at runtime)
+    modImplementation "com.terraformersmc:modmenu:${modmenu_version}"
 }
 
 loom {

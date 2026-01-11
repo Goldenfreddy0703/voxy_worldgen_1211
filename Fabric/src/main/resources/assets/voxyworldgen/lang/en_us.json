@@ -1,0 +1,21 @@
+{
+    "config.voxyworldgen.title": "Voxy World Gen Configuration",
+    "config.voxyworldgen.category.settings": "Settings",
+    "config.voxyworldgen.category.settings.tooltip": "All configuration options for Voxy World Gen",
+    "config.voxyworldgen.group.general": "General Settings",
+    "config.voxyworldgen.group.general.description": "Core mod settings and performance options",
+    "config.voxyworldgen.enabled": "Enable Chunk Generation",
+    "config.voxyworldgen.enabled.description": "Master toggle for the passive chunk generation system. When disabled, no new chunks will be generated passively.",
+    "config.voxyworldgen.chunks_per_tick": "Chunks Per Tick",
+    "config.voxyworldgen.chunks_per_tick.description": "How many chunks to process per server tick. Higher values generate chunks faster but may impact server performance.",
+    "config.voxyworldgen.generation_style": "Generation Pattern",
+    "config.voxyworldgen.generation_style.description": "The pattern used to generate chunks around players and spawn. Different patterns affect how quickly nearby vs distant chunks are loaded.\n\n§6Spiral Out§r: Starts at center, spirals outward (best for exploration)\n§6Spiral In§r: Starts at edge, spirals inward\n§6Concentric§r: Generates in square rings around center\n§6Original§r: Line-based pattern (fastest, less uniform)\n§6Random§r: Random order within radius",
+    "config.voxyworldgen.group.distances": "Distance Settings",
+    "config.voxyworldgen.group.distances.description": "Configure generation distances around players and world spawn",
+    "config.voxyworldgen.player_distance": "Player Radius",
+    "config.voxyworldgen.player_distance.description": "The radius (in chunks) around each player where new chunks will be passively generated. This helps pre-load areas players are likely to visit.",
+    "config.voxyworldgen.spawn_distance": "Spawn Radius",
+    "config.voxyworldgen.spawn_distance.description": "The radius (in chunks) around the world spawn point where chunks will be passively generated. Set to 0 to disable spawn-based generation.",
+    "config.voxyworldgen.prioritize_player": "Prioritize Near Players",
+    "config.voxyworldgen.prioritize_player.description": "When enabled, chunks closer to players will be generated before chunks further away. This ensures the most relevant areas are loaded first."
+}
