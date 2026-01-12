@@ -1,5 +1,8 @@
 # Voxy World Gen
 
+Supports 1.21.11, 1.21.10, 1.21.9, 1.21.8, 1.21.7, 1.21.6!
+
+
 Automatically generates chunks around players as they explore, integrating with Voxy for LOD generation.
 
 ![Voxy World Gen Logo](pregen-logo.png)
