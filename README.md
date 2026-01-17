@@ -1,6 +1,6 @@
-# Voxy World Gen
+# Voxy World Gen Backport for Minecraft 1.21.1
 
-Supports 1.21.11, 1.21.10, 1.21.9, 1.21.8, 1.21.7, 1.21.6!
+## PLEASE FOR THE LOVE OF GOD DON'T BOTHER THE FINE PEOPLE ON CORTEX DISCORD WITH BUGS RELATING TO THIS, NO SUPPORT FOR BACKPORTS WILL BE GIVEN
 
 
 Automatically generates chunks around players as they explore, integrating with Voxy for LOD generation.
