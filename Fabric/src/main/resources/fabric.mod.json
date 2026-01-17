@@ -34,11 +34,11 @@
   "depends": {
     "fabricloader": ">=0.16",
     "fabric": "*",
-    "minecraft": ">=1.21.6 <1.21.12",
+    "minecraft": "=1.21.1",
     "java": ">=21"
   },
   "suggests": {
     "modmenu": "*",
-    "yet_another_config_lib": ">=3.8.0"
+    "yet_another_config_lib": ">=3.7.0"
   }
 }

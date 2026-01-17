@@ -5,6 +5,7 @@ import dev.iseeethan.voxyworldgen.Constants;
 import dev.iseeethan.voxyworldgen.platform.Services;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
@@ -28,15 +29,37 @@ public class StaticIdentifiableLevelPos extends StaticLevelPos {
                         chunkPosCoord(player.getZ())));
     }
 
+//    public StaticIdentifiableLevelPos(UUID uuid, CompoundTag tag) {
+//        this(uuid,
+//                Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, tag.get("Dimension"))
+//                        .resultOrPartial(Constants.LOG::error)
+//                        .orElse(Level.OVERWORLD),
+//                tag.getList("Pos")
+//                        .map(list -> new ChunkPos(chunkPosCoord(list.getDouble(0).orElse(0.0)),
+//                                chunkPosCoord(list.getDouble(2).orElse(0.0))))
+//                        .orElse(new ChunkPos(0, 0)));
+//    }
+
     public StaticIdentifiableLevelPos(UUID uuid, CompoundTag tag) {
-        this(uuid,
-                Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, tag.get("Dimension"))
-                        .resultOrPartial(Constants.LOG::error)
-                        .orElse(Level.OVERWORLD),
-                tag.getList("Pos")
-                        .map(list -> new ChunkPos(chunkPosCoord(list.getDouble(0).orElse(0.0)),
-                                chunkPosCoord(list.getDouble(2).orElse(0.0))))
-                        .orElse(new ChunkPos(0, 0)));
+        this(
+                uuid,
+                parseDimension(tag),
+                parseChunkPos(tag)
+        );
+    }
+
+    private static ResourceKey<Level> parseDimension(CompoundTag tag) {
+        return Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, tag.get("Dimension"))
+                .resultOrPartial(Constants.LOG::error)
+                .orElse(Level.OVERWORLD);
+    }
+
+    private static ChunkPos parseChunkPos(CompoundTag tag) {
+        ListTag listTag = tag.getList("Tags", Tag.TAG_DOUBLE);
+        return new ChunkPos(
+                chunkPosCoord(listTag.getDouble(0)),
+                chunkPosCoord(listTag.getDouble(2))
+        );
     }
 
     public StaticIdentifiableLevelPos(UUID uuid, ResourceKey<Level> level, ChunkPos pos) {
@@ -46,5 +69,9 @@ public class StaticIdentifiableLevelPos extends StaticLevelPos {
 
     public int loadDistance() {
         return Services.PLATFORM.getPlayerLoadDistance();
+    }
+
+    public Object getUuid() {
+        return this.uuid;
     }
 }

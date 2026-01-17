@@ -65,7 +65,7 @@ public class VoxyWorldGenCommon {
     }
 
     public static void onServerStart(MinecraftServer server) {
-        BlockPos spawnPos = server.overworld().getLevelData().getRespawnData().pos();
+        BlockPos spawnPos = server.overworld().getLevelData().getSpawnPos();
         spawnPoint = new StaticLevelPos(Level.OVERWORLD, spawnPos.getX(), spawnPos.getZ());
     }
 

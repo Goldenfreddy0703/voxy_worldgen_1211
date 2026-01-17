@@ -13,7 +13,7 @@ public interface ILevelPos {
 
     static int chunkPosCoord(Tag tag) {
         if (tag instanceof NumericTag numericTag) {
-            return chunkPosCoord(numericTag.doubleValue());
+            return chunkPosCoord(numericTag.getAsDouble());
         }
         Constants.LOG.warn("position tag was not a double value");
         return 0;

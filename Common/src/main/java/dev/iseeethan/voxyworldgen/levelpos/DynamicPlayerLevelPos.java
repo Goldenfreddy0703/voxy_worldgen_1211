@@ -30,4 +30,8 @@ public class DynamicPlayerLevelPos implements ILevelPos {
     public ChunkPos getPos() {
         return new ChunkPos(chunkPosCoord(player.getX()), chunkPosCoord(player.getZ()));
     }
+
+    public ServerPlayer getPlayer() {
+        return player;
+    }
 }
