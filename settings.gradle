@@ -5,12 +5,7 @@ pluginManagement {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
-        maven {
-            name = 'Sponge Snapshots'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
     }
 }
 
-rootProject.name = 'MultiLoader'
-include("Common", "Fabric")
+rootProject.name = 'voxy-worldgen-v2'

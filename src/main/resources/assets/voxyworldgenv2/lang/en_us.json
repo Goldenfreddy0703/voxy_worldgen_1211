@@ -1,0 +1,18 @@
+{
+  "config.voxyworldgenv2.title": "Voxy World Gen V2 Config",
+  "config.voxyworldgenv2.category.general": "General",
+  "config.voxyworldgenv2.option.enabled": "Enabled",
+  "config.voxyworldgenv2.option.enabled.tooltip": "Enable or disable chunk generation for Voxy",
+  "config.voxyworldgenv2.option.f3_stats": "Show F3 Stats",
+  "config.voxyworldgenv2.option.f3_stats.tooltip": "Show generation statistics in the F3 debug overlay",
+  "config.voxyworldgenv2.option.radius": "Generation Radius",
+  "config.voxyworldgenv2.option.radius.tooltip": "Radius in chunks around players to generate LOD data",
+  "config.voxyworldgenv2.option.update_interval": "Update Interval",
+  "config.voxyworldgenv2.option.update_interval.tooltip": "How often (in ticks) to check for new work",
+  "config.voxyworldgenv2.option.max_queue": "Max Queue Size",
+  "config.voxyworldgenv2.option.max_queue.tooltip": "Maximum number of chunks that can be queued for generation",
+  "config.voxyworldgenv2.option.max_active": "Max Active Tasks",
+  "config.voxyworldgenv2.option.max_active.tooltip": "Maximum number of chunk generation tasks running simultaneously",
+  "config.voxyworldgenv2.option.save_normal_chunks": "Save Generated Chunks",
+  "config.voxyworldgenv2.option.save_normal_chunks.tooltip": "When disabled, chunks generated only for LOD will not be saved to disk. Reduces world size but chunks will need to be regenerated on restart."
+}

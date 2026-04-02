@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "voxyworldgenv2",
+  "version": "${version}",
+  "name": "Voxy World Gen V2",
+  "description": "Generate chunks for Voxy LOD rendering - v2 architecture for 1.21.1",
+  "authors": ["iseeethan"],
+  "contact": {
+    "sources": "https://github.com/iseeethan/voxy-world-gen"
+  },
+  "license": "MIT",
+  "icon": "assets/voxyworldgenv2/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.ethan.voxyworldgenv2.VoxyWorldGenV2"],
+    "client": ["com.ethan.voxyworldgenv2.VoxyWorldGenV2Client"],
+    "modmenu": ["com.ethan.voxyworldgenv2.integration.ModMenuIntegration"]
+  },
+  "mixins": [
+    "voxyworldgenv2.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": ">=1.21 <=1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "cloth-config": "*",
+    "modmenu": "*"
+  }
+}
